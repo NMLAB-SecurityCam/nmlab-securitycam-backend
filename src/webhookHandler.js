@@ -10,12 +10,12 @@ const webhookHandler = async (event, client) => {
   if (event.type === 'message' && event.message.text.slice(0, 4) === '!id:') {
     // register a [lineID, userId] user obj to DB's collection
     const lineId = event.message.text.split(':')?.[1] ?? '';
-    if (lineId !== '') {
+    if (lineId !== '' || lineId.trim() === '') {
       const userObj = await Users.findById(lineId);
       if (userObj) {
         return client.replyMessage(event.replyToken, {
           type: 'text',
-          text: `Your userId is registered already.`,
+          text: `Your LineId has registered already.`,
         });
       } else {
         const newUserObj = new Users({
@@ -42,7 +42,7 @@ const webhookHandler = async (event, client) => {
       return client.replyMessage(event.replyToken, [
         {
           type: 'text',
-          text: 'Invalid format, try again. (!id: MY_LINEID)',
+          text: 'Invalid format, please try again. Valid format:\n !id: MY_LINEID',
         },
       ]);
     }
