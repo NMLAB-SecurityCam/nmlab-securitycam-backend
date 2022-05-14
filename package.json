@@ -5,8 +5,11 @@
   "author": "swh00tw <a6140000@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon --exec babel-node src/server.js",
-    "dev": "nodemon --ext js --watch src --exec babel-node src/server.js"
+    "dev": "nodemon --ext js --watch src --exec babel-node src/server.js",
+    "build": "npm run clean && npm run build-babel",
+    "build-babel": "./node_modules/.bin/babel -d ./build ./src",
+    "clean": "rm -rf build && mkdir build",
+    "start": "node ./build/src/server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
