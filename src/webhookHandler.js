@@ -9,8 +9,9 @@ const webhookHandler = async (event, client) => {
   // trigger when typing `!id: ...`
   if (event.type === 'message' && event.message.text.slice(0, 4) === '!id:') {
     // register a [lineID, userId] user obj to DB's collection
-    const lineId = event.message.text.split(':')?.[1] ?? '';
-    if (lineId !== '' || lineId.trim() === '') {
+    let lineId = event.message.text.split(':')?.[1] ?? '';
+    if (lineId !== '' || lineId.trim() !== '') {
+      lineId = lineId.trim();
       const userObj = await Users.findById(lineId);
       if (userObj) {
         return client.replyMessage(event.replyToken, {
