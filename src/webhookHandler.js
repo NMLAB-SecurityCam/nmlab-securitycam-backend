@@ -1,8 +1,51 @@
-// webhookHandler
+import mongoose from 'mongoose';
+import Users from './Users';
 
-const webhookHandler = (event, client) => {
+const webhookHandler = async (event, client) => {
   if (event.type !== 'message' || event.message.type !== 'text') {
     return Promise.resolve(null);
+  }
+
+  // trigger when typing `!id: ...`
+  if (event.type === 'message' && event.message.text.slice(0, 4) === '!id:') {
+    // register a [lineID, userId] user obj to DB's collection
+    const lineId = event.message.text.split(':')?.[1] ?? '';
+    if (lineId !== '') {
+      const userObj = await Users.findById(lineId);
+      if (userObj) {
+        return client.replyMessage(event.replyToken, {
+          type: 'text',
+          text: `Your userId is registered already.`,
+        });
+      } else {
+        const newUserObj = new Users({
+          _id: lineId,
+          userId: event.source.userId,
+        });
+        try {
+          await newUserObj.save();
+          return client.replyMessage(event.replyToken, [
+            {
+              type: 'text',
+              text: 'Success :)',
+            },
+          ]);
+        } catch (err) {
+          console.log(err);
+          return client.replyMessage(event.replyToken, {
+            type: 'text',
+            text: `Error when registering!`,
+          });
+        }
+      }
+    } else {
+      return client.replyMessage(event.replyToken, [
+        {
+          type: 'text',
+          text: 'Invalid format, try again. (!id: MY_LINEID)',
+        },
+      ]);
+    }
   }
 
   /*
