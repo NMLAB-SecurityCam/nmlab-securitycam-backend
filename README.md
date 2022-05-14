@@ -1,6 +1,6 @@
 # Deploy To Github
 
-Install heroku command line first.
+Install heroku command line tool first.
 
 If not login,
 
@@ -8,6 +8,7 @@ If not login,
 heroku login
 ```
 
+Push to production,
 ```
 git add .
 git commit -m "..."
