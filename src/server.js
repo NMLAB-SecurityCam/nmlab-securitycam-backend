@@ -13,24 +13,34 @@ const LineSDKConfig = {
 const client = new line.Client(LineSDKConfig);
 
 const app = express();
+if (process.env.MODE === "prod") {
+  app.use(line.middleware(LineSDKConfig));
+}
 app.use(cors());
-// app.use(express.json());
+app.use(express.json());
 app.use(
   express.urlencoded({
     extended: true,
   })
 );
 
+// for health check
 app.get("/", (req, res) => {
   res.status(200).send("health check passed!");
 });
 
-app.post("/webhook", line.middleware(LineSDKConfig), (req, res) => {
+// for line webhook (response to events)
+app.post("/webhook", (req, res) => {
   Promise.all(
     req.body.events.map((e) => {
       webhookHandler(e, client);
     })
   ).then((result) => res.json(result));
+});
+
+// for our camera services
+app.post("/alert", (req, res) => {
+  console.log(req.body);
 });
 
 app.listen(process.env.PORT || 5000, () => {
