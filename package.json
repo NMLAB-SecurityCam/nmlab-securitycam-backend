@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "nodemon --ext js --watch src --exec babel-node src/server.js",
-    "build": "npm run clean && npm run build-babel",
+    "build": "yarn clean && yarn build-babel",
     "build-babel": "./node_modules/.bin/babel -d ./build ./src",
     "clean": "rm -rf build && mkdir build",
     "start": "node ./build/server.js"
