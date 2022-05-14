@@ -19,5 +19,5 @@ git push heroku master
 # Run locally
 
 ```
-yarn dev
+yarn && yarn dev
 ```
