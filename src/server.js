@@ -23,13 +23,13 @@ app.get("/", (req, res) => {
   res.status(200).send("health check passed!");
 });
 
-app.post("/webhook", line.middleware(config), (req, res) => {
+app.post("/webhook", line.middleware(LineSDKConfig), (req, res) => {
   Promise.all(req.body.events.map(handleEvent)).then((result) =>
     res.json(result)
   );
 });
 
-const client = new line.Client(config);
+const client = new line.Client(LineSDKConfig);
 function handleEvent(event) {
   if (event.type !== "message" || event.message.type !== "text") {
     return Promise.resolve(null);
@@ -95,5 +95,5 @@ function handleEvent(event) {
 // });
 
 app.listen(process.env.PORT || 5000, () => {
-  console.log(`App listening at http://localhost:${PORT}`);
+  console.log(`App listening at http://localhost:${process.env.PORT || 5000}`);
 });
