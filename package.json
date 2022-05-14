@@ -1,0 +1,10 @@
+{
+  "name": "nmlab-securitycam",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "swh00tw <a6140000@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
