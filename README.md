@@ -14,6 +14,14 @@ Push to production,
 git push heroku master
 ```
 
+You can run
+
+```
+heroku logs --tail
+```
+
+to check the deploy result & log on heroku server
+
 # Run locally
 
 ```
