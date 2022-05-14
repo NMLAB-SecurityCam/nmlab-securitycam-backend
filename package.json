@@ -5,7 +5,7 @@
   "author": "swh00tw <a6140000@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "server": "nodemon src/server.js --ext js --watch src --exec babel-node"
+    "start": "nodemon src/server.js --ext js --watch src --exec babel-node"
   },
   "dependencies": {
     "cors": "^2.8.5",
