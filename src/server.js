@@ -9,6 +9,7 @@ const LineSDKConfig = {
   channelAccessToken: process.env.LINE_ACCESS_TOKEN,
   channelSecret: process.env.LINE_CHANNEL_SECRET,
 };
+const client = new line.Client(LineSDKConfig);
 
 const app = express();
 app.use(cors());
@@ -24,21 +25,29 @@ app.get("/", (req, res) => {
 });
 
 app.post("/webhook", line.middleware(LineSDKConfig), (req, res) => {
-  Promise.all(req.body.events.map(handleEvent)).then((result) =>
-    res.json(result)
-  );
+  Promise.all(
+    req.body.events.map((e) => {
+      handleEvent(e, client);
+    })
+  ).then((result) => res.json(result));
 });
 
-const client = new line.Client(LineSDKConfig);
-function handleEvent(event) {
+function handleEvent(event, client) {
   if (event.type !== "message" || event.message.type !== "text") {
     return Promise.resolve(null);
   }
 
-  return client.replyMessage(event.replyToken, {
-    type: "text",
-    text: event.message.text,
-  });
+  /*
+      implement response logic here,
+      currently, just echo back the message
+  */
+
+  return client.replyMessage(event.replyToken, [
+    {
+      type: "text",
+      text: event.message.text,
+    },
+  ]);
 }
 
 // app.post("/webhook", line.middleware(LineSDKConfig), function (req, res) {
