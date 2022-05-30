@@ -5,6 +5,8 @@ import https from 'https';
 import cors from 'cors';
 import * as line from '@line/bot-sdk';
 import webhookHandler from './webhookHandler';
+import Users from './Users';
+import pushMessages from './pushMessages';
 import dotenv from 'dotenv-defaults';
 import mongoose from 'mongoose';
 dotenv.config();
@@ -50,9 +52,21 @@ app.post('/webhook', (req, res) => {
 });
 
 // for our camera services
-app.post('/alert', (req, res) => {
-  console.log(req.body);
+// should be sent with LineId
+// try type $curl -X POST http://localhost:5000/alert -H 'Content-Type:application/json' -d '{"id": "theLindIDYouWantToSendMsgTo"}'
+app.post('/alert', async(req, res) => {
+  console.log(typeof(req.body.id));
+  console.log(req.body.id);
+  const userObj = await Users.findById(req.body.id);
+  // console.log(userObj);
+  pushMessages(userObj.userId);
+  res.json("{data: passed}");
 });
+
+// app.post('/snapshot', (req, res) => {
+//   console.log(req.body);
+//   console.log("hi snapshot");
+// })
 
 app.listen(process.env.PORT || 5000, () => {
   console.log(`App listening at http://localhost:${process.env.PORT || 5000}`);
