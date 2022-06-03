@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
 import Users from './Users';
-import pushMessages from './pushMessages';
+
+const mock_up_img_url = 'https://nmlab-final-securitycam.s3.ap-northeast-1.amazonaws.com/img-1653129955256.png';
 
 const webhookHandler = async (event, client) => {
   if (event.type !== 'message' || event.message.type !== 'text') {
@@ -50,29 +50,28 @@ const webhookHandler = async (event, client) => {
     }
   }
 
-
   // snapshot
-  if (event.type === 'message' && event.message.text === "!snapshot") {
+  if (event.type === 'message' && event.message.text === '!snapshot') {
     // register a [lineID, userId] user obj to DB's collection
-    console.log("in here");
-    const userObj = await Users.find({"userId": event.source.userId});
-    if (userObj) {
+    const userObj = await Users.find({ userId: event.source.userId });
+    if (userObj?.userId) {
       // can do requets to ask the machine to take pics and save it in s3 and transfer it back here
-      pushMessages("Uad9e50a3bcd7e3df44d80e068631a36e");
+      await client.pushMessage(user_id, {
+        type: 'image',
+        originalContentUrl: mock_up_img_url,
+        previewImageUrl: mock_up_img_url,
+      });
       return client.replyMessage(event.replyToken, {
         type: 'text',
-        text: 'Will send pic to your LineId.',
+        text: 'Here is you snapshot.',
       });
-    } 
-    else {
+    } else {
       return client.replyMessage(event.replyToken, {
         type: 'text',
         text: 'You have not registered yet, please register first.',
-    });
-    } 
+      });
+    }
   }
-
-
 
   /*
     implement response logic here,

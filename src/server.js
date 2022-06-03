@@ -6,7 +6,6 @@ import cors from 'cors';
 import * as line from '@line/bot-sdk';
 import webhookHandler from './webhookHandler';
 import Users from './Users';
-import pushMessages from './pushMessages';
 import dotenv from 'dotenv-defaults';
 import mongoose from 'mongoose';
 dotenv.config();
@@ -52,22 +51,38 @@ app.post('/webhook', (req, res) => {
 });
 
 // for our camera services
-// should be sent with LineId
-// try type $curl -X POST http://localhost:5000/alert -H 'Content-Type:application/json' -d '{"id": "theLindIDYouWantToSendMsgTo"}'
-app.post('/alert', async(req, res) => {
-  console.log(typeof(req.body.id));
-  console.log(req.body.id);
+// payload {"id": "LineID", img_url: "https://..."}
+app.post('/alert', async (req, res) => {
   const userObj = await Users.findById(req.body.id);
-  // console.log(userObj);
-  pushMessages(userObj.userId);
-  res.json("{data: passed}");
+  if (userObj?.userId) {
+    const alertMsg = {
+      type: 'text',
+      text: '$ Alert detected! $',
+      emojis: [
+        {
+          index: 0,
+          productId: '5ac21cc5031a6752fb806d5c',
+          emojiId: '003',
+        },
+        {
+          index: 18,
+          productId: '5ac21cc5031a6752fb806d5c',
+          emojiId: '004',
+        },
+      ],
+    };
+    await client.pushMessage(userObj.userId, alertMsg);
+    await client.pushMessage(userObj.userId, {
+      type: 'image',
+      originalContentUrl: req.body.img_url,
+      previewImageUrl: req.body.img_url,
+    });
+    res.status(200).send({ message: 'Message forwarded successfully!' });
+  } else {
+    res.status(400).send({ message: 'UserID not found. Either the user does not exist or user does not register and activate this feature.' });
+  }
 });
 
-// app.post('/snapshot', (req, res) => {
-//   console.log(req.body);
-//   console.log("hi snapshot");
-// })
-
 app.listen(process.env.PORT || 5000, () => {
-  console.log(`App listening at http://localhost:${process.env.PORT || 5000}`);
+  console.log(`App listening at ${process.env.MODE === 'prod' ? 'https://nmlab-securitycam.herokuapp.com' : 'localhost'}:${process.env.PORT || 5000}`);
 });
