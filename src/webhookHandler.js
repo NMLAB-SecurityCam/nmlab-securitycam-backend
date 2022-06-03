@@ -52,7 +52,7 @@ const webhookHandler = async (event, client) => {
 
   // snapshot
   if (event.type === 'message' && event.message.text === '!snapshot') {
-    const userObj = await Users.find({ userId: event.source.userId });
+    const userObj = await Users.findOne({ userId: event.source.userId });
     if (userObj?.userId) {
       // can do requets to ask the machine to take pics and save it in s3 and transfer it back here
       await client.pushMessage(userObj.userId, {
