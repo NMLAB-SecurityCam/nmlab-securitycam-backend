@@ -8,10 +8,14 @@ If not login,
 heroku login
 ```
 
-Push to production,
+Push to branch besides from main/master to production,
 
 ```
-git push heroku <Current_branch_name>
+git push heroku <Current_test_branch_name>:main
+```
+Push main/master to production
+```
+git push heroku main
 ```
 
 You can run
