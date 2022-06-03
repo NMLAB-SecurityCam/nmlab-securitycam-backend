@@ -52,11 +52,10 @@ const webhookHandler = async (event, client) => {
 
   // snapshot
   if (event.type === 'message' && event.message.text === '!snapshot') {
-    // register a [lineID, userId] user obj to DB's collection
     const userObj = await Users.find({ userId: event.source.userId });
     if (userObj?.userId) {
       // can do requets to ask the machine to take pics and save it in s3 and transfer it back here
-      await client.pushMessage(user_id, {
+      await client.pushMessage(userObj.userId, {
         type: 'image',
         originalContentUrl: mock_up_img_url,
         previewImageUrl: mock_up_img_url,
