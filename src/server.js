@@ -43,6 +43,7 @@ app.get('/', (req, res) => {
 
 // for line webhook (response to events)
 app.post('/webhook', (req, res) => {
+  console.log('req: ', req);
   Promise.all(
     req.body.events.map(e => {
       webhookHandler(e, client);
