@@ -1,5 +1,6 @@
-import mongoose from 'mongoose';
 import Users from './Users';
+
+const mock_up_img_url = 'https://nmlab-final-securitycam.s3.ap-northeast-1.amazonaws.com/img-1653129955256.png';
 
 const webhookHandler = async (event, client) => {
   if (event.type !== 'message' || event.message.type !== 'text') {
@@ -49,6 +50,28 @@ const webhookHandler = async (event, client) => {
     }
   }
 
+  // snapshot
+  if (event.type === 'message' && event.message.text === '!snapshot') {
+    const userObj = await Users.findOne({ userId: event.source.userId });
+    if (userObj?.userId) {
+      // can do requets to ask the machine to take pics and save it in s3 and transfer it back here
+      await client.pushMessage(userObj.userId, {
+        type: 'image',
+        originalContentUrl: mock_up_img_url,
+        previewImageUrl: mock_up_img_url,
+      });
+      return client.replyMessage(event.replyToken, {
+        type: 'text',
+        text: 'Here is you snapshot.',
+      });
+    } else {
+      return client.replyMessage(event.replyToken, {
+        type: 'text',
+        text: 'You have not registered yet, please register first.',
+      });
+    }
+  }
+
   /*
     implement response logic here,
     currently, just echo back the message
@@ -72,14 +95,6 @@ const webhookHandler = async (event, client) => {
     {
       type: 'text',
       text: 'stfu',
-    },
-    {
-      type: 'text',
-      text: '你從桃園新竹你從桃園新竹你從桃園新竹你從桃園新竹你從桃園新竹你從桃園新竹你從桃園新竹你從桃園新竹你從桃園新竹你從桃園新竹你從桃園新竹你從桃園新竹',
-    },
-    {
-      type: 'text',
-      text: '太神啦',
     },
   ]);
 };
