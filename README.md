@@ -11,7 +11,7 @@ heroku login
 Push to production,
 
 ```
-git push heroku main
+git push heroku <Current_branch_name>
 ```
 
 You can run
