@@ -1,4 +1,5 @@
 import Users from './Users';
+import { grpc_client, getImageUrl } from './service/gRPC_client';
 
 const mock_up_img_url = 'https://nmlab-final-securitycam.s3.ap-northeast-1.amazonaws.com/img-1653129955256.png';
 
@@ -55,6 +56,9 @@ const webhookHandler = async (event, client) => {
     const userObj = await Users.findOne({ userId: event.source.userId });
     if (userObj?.userId) {
       // can do requets to ask the machine to take pics and save it in s3 and transfer it back here
+      // use getImageUrl() to get the url
+      const img_url = await getImageUrl(grpc_client);
+      console.log('img_url: ', img_url);
       await client.pushMessage(userObj.userId, {
         type: 'image',
         originalContentUrl: mock_up_img_url,

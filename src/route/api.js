@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import Users from '../Users';
 import { client } from '../client';
+import { grpc_client, getImageUrl } from '../service/gRPC_client';
 dotenv.config();
 
 // router initialization
@@ -20,6 +21,8 @@ router.use(
 // payload {"id": "LineID", img_url: "https://..."}
 router.post('/alert', async (req, res) => {
   const userObj = await Users.findById(req.body.id);
+  const img_url = await getImageUrl(grpc_client);
+  console.log('img_url: ', img_url);
   if (userObj?.userId) {
     const alertMsg = {
       type: 'text',
