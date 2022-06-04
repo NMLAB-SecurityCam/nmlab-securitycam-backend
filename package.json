@@ -12,6 +12,7 @@
         "start": "node ./build/server.js"
     },
     "dependencies": {
+        "@grpc/proto-loader": "^0.6.12",
         "@line/bot-sdk": "^7.5.0",
         "core-js": "^3.22.5",
         "cors": "^2.8.5",
