@@ -20,6 +20,7 @@ router.use(
 // for our camera services
 // payload {"id": "LineID", img_url: "https://..."}
 router.post('/alert', async (req, res) => {
+  console.log('req: ', req);
   const userObj = await Users.findById(req.body.id);
   const img_url = await getImageUrl(grpc_client);
   console.log('img_url: ', img_url);
