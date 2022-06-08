@@ -12,6 +12,7 @@ Push test branch besides from main/master to production,
 
 ```
 git push heroku <Current_test_branch_name>:main
+(or git push -f heroku <Current_test_branch_name>:main)
 ```
 Push main/master to production
 ```
