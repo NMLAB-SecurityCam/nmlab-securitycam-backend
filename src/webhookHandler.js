@@ -1,4 +1,5 @@
 import Users from './Users';
+import { mqtt_publisher, publish, mqtt_topic } from './mqtt_client';
 
 const mock_up_img_url = 'https://nmlab-final-securitycam.s3.ap-northeast-1.amazonaws.com/img-1653129955256.png';
 
@@ -55,15 +56,17 @@ const webhookHandler = async (event, client) => {
     const userObj = await Users.findOne({ userId: event.source.userId });
     if (userObj?.userId) {
       // can do requets to ask the machine to take pics and save it in s3 and transfer it back here
-      await client.pushMessage(userObj.userId, {
-        type: 'image',
-        originalContentUrl: mock_up_img_url,
-        previewImageUrl: mock_up_img_url,
-      });
-      return client.replyMessage(event.replyToken, {
-        type: 'text',
-        text: 'Here is you snapshot.',
-      });
+      publish(mqtt_publisher, mqtt_topic, { command: 'snapshot' });
+      // TODO: move to another API: forward the snapshot image to the user
+      // await client.pushMessage(userObj.userId, {
+      //   type: 'image',
+      //   originalContentUrl: mock_up_img_url,
+      //   previewImageUrl: mock_up_img_url,
+      // });
+      // return client.replyMessage(event.replyToken, {
+      //   type: 'text',
+      //   text: 'Here is you snapshot.',
+      // });
     } else {
       return client.replyMessage(event.replyToken, {
         type: 'text',

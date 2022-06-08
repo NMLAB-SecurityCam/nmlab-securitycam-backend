@@ -7,6 +7,7 @@ import dotenv from 'dotenv-defaults';
 import mongoose from 'mongoose';
 import { client, LineSDKConfig } from './client';
 import custom_api_router from './route/api';
+import { mqtt_publisher } from './mqtt_client';
 dotenv.config();
 
 mongoose
@@ -16,6 +17,10 @@ mongoose
   })
   .then(res => console.log('MongoDB connection created'))
   .catch(err => console.log(`MongoDB connection failed`));
+
+mqtt_publisher.on('connect', () => {
+  console.log('MQTT client connected');
+});
 
 const app = express();
 app.use('/api', custom_api_router);
