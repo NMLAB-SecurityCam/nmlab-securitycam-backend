@@ -1,11 +1,13 @@
 import mqtt from 'mqtt';
+import dotenv from 'dotenv-defaults';
+dotenv.config();
 
 // MQTT
 const mqtt_host = 'broker.emqx.io';
 const mqtt_port = '1883';
 const mqtt_clientId = `mqtt_${Math.random().toString(16).slice(3)}`;
 const mqtt_connectUrl = `mqtt://${mqtt_host}:${mqtt_port}`;
-const mqtt_topic = 'nmlab-securitycam-mqtt-channel';
+const mqtt_topic = `${process.env.MQTT_CHANNEL}`;
 const mqtt_publisher = mqtt.connect(mqtt_connectUrl, {
   mqtt_clientId,
   clean: true,

@@ -63,10 +63,10 @@ const webhookHandler = async (event, client) => {
       //   originalContentUrl: mock_up_img_url,
       //   previewImageUrl: mock_up_img_url,
       // });
-      // return client.replyMessage(event.replyToken, {
-      //   type: 'text',
-      //   text: 'Here is you snapshot.',
-      // });
+      return client.replyMessage(event.replyToken, {
+        type: 'text',
+        text: 'Here is you snapshot.',
+      });
     } else {
       return client.replyMessage(event.replyToken, {
         type: 'text',
