@@ -8,7 +8,7 @@ const webhookHandler = async (event, client) => {
     return Promise.resolve(null);
   }
 
-  // trigger when typing `!id: ...`
+  // setup lineID
   if (event.type === 'message' && event.message.text.slice(0, 4) === '!id:') {
     // register a [lineID, userId] user obj to DB's collection
     let lineId = event.message.text.split(':')?.[1] ?? '';
@@ -48,6 +48,38 @@ const webhookHandler = async (event, client) => {
           text: 'Invalid format, please try again. Valid format:\n !id: MY_LINEID',
         },
       ]);
+    }
+  }
+
+  // setup yt streaming key
+  if (event.type === 'message' && event.message.text.split(':')?.[0] === '!streaming_key') {
+    const userObj = await Users.findOne({ userId: event.source.userId });
+    const streamingKey = event.message.text.split(':')?.[1] ?? '';
+    if (userObj) {
+      if (streamingKey !== '' || streamingKey.trim() !== '') {
+        try {
+          await Users.updateOne({ _id: userObj._id }, { streamingKey: streamingKey });
+          return client.replyMessage(event.replyToken, {
+            type: 'text',
+            text: 'Update streaming key successfully!',
+          });
+        } catch {
+          return client.replyMessage(event.replyToken, {
+            type: 'text',
+            text: 'Error when updating streaming key, try again or contact us.',
+          });
+        }
+      } else {
+        return client.replyMessage(event.replyToken, {
+          type: 'text',
+          text: 'Invalid streaming key!',
+        });
+      }
+    } else {
+      return client.replyMessage(event.replyToken, {
+        type: 'text',
+        text: 'You have not registered yet, please register first.',
+      });
     }
   }
 
