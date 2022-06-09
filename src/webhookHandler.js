@@ -65,7 +65,7 @@ const webhookHandler = async (event, client) => {
       // });
       return client.replyMessage(event.replyToken, {
         type: 'text',
-        text: 'Here is you snapshot.',
+        text: 'Here is your snapshot.',
       });
     } else {
       return client.replyMessage(event.replyToken, {
