@@ -52,7 +52,7 @@ const webhookHandler = async (event, client) => {
   }
 
   // snapshot
-  if (event.type === 'message' && event.message.text === '!snapshot') {
+  if (event.type === 'message' && event.message.text.trim() === '!snapshot') {
     const userObj = await Users.findOne({ userId: event.source.userId });
     if (userObj?.userId) {
       // can do requets to ask the machine to take pics and save it in s3 and transfer it back here
@@ -71,6 +71,23 @@ const webhookHandler = async (event, client) => {
       return client.replyMessage(event.replyToken, {
         type: 'text',
         text: 'You have not registered yet, please register first.',
+      });
+    }
+  }
+
+  // enable or disable alert
+  if (event.type === 'message' && event.message.text.slice(0, 7) === '!alert:') {
+    if (event.message.text.split(':')?.[1].trim() === '1') {
+      publish(mqtt_publisher, mqtt_topic, { command: 'alert', enable: true });
+      return client.replyMessage(event.replyToken, {
+        type: 'text',
+        text: 'Enable alert feature.',
+      });
+    } else if (event.message.text.split(':')?.[1].trim() === '0') {
+      publish(mqtt_publisher, mqtt_topic, { command: 'alert', enable: false });
+      return client.replyMessage(event.replyToken, {
+        type: 'text',
+        text: 'Disable alert feature.',
       });
     }
   }
