@@ -18,6 +18,10 @@ const webhookHandler = async (event, client) => {
       const findUser = await Users.findOne({ userId: event.source.userId });
       if (findUser) {
         await Users.updateOne({ userId: event.source.userId }, { _id: lineId });
+        return client.replyMessage(event.replyToken, {
+          type: 'text',
+          text: `ID updated successfully.`,
+        });
       }
       // else, create a new user obj
       const userObj = await Users.findById(lineId);
