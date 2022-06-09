@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import Users from '../Users';
 import { client } from '../client';
+import saveImage from '../saveImages';
 dotenv.config();
 
 // router initialization
@@ -15,6 +16,11 @@ router.use(
     extended: true,
   })
 );
+
+router.get('/whitelist', async (req, res) => {
+  saveImage('https://nmlab-final-securitycam.s3.ap-northeast-1.amazonaws.com/img-1653129955256.png');
+  res.status(200).send("QQ");
+});
 
 // for our camera services
 // payload {"id": "LineID", img_url: "https://..."}
