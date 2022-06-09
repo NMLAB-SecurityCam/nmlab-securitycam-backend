@@ -14,6 +14,12 @@ const webhookHandler = async (event, client) => {
     let lineId = event.message.text.split(':')?.[1] ?? '';
     if (lineId !== '' || lineId.trim() !== '') {
       lineId = lineId.trim();
+      // if userId already exists, update the lineID
+      const findUser = await Users.findOne({ userId: event.source.userId });
+      if (findUser) {
+        await Users.updateOne({ userId: event.source.userId }, { _id: lineId });
+      }
+      // else, create a new user obj
       const userObj = await Users.findById(lineId);
       if (userObj) {
         return client.replyMessage(event.replyToken, {
