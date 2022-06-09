@@ -91,12 +91,6 @@ const webhookHandler = async (event, client) => {
     if (userObj?.userId) {
       // can do requets to ask the machine to take pics and save it in s3 and transfer it back here
       publish(mqtt_publisher, mqtt_topic, { command: 'snapshot' });
-      // TODO: move to another API: forward the snapshot image to the user
-      // await client.pushMessage(userObj.userId, {
-      //   type: 'image',
-      //   originalContentUrl: mock_up_img_url,
-      //   previewImageUrl: mock_up_img_url,
-      // });
       return client.replyMessage(event.replyToken, {
         type: 'text',
         text: 'Here is your snapshot.',
