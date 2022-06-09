@@ -111,17 +111,42 @@ const webhookHandler = async (event, client) => {
 
   // enable or disable alert
   if (event.type === 'message' && event.message.text.slice(0, 7) === '!alert:') {
-    if (event.message.text.split(':')?.[1].trim() === '1') {
+    if ((event.message.text.split(':')?.[1] ?? '').trim() === '1') {
       publish(mqtt_publisher, mqtt_topic, { command: 'alert', enable: true });
       return client.replyMessage(event.replyToken, {
         type: 'text',
         text: 'Enable alert feature.',
       });
-    } else if (event.message.text.split(':')?.[1].trim() === '0') {
+    } else if ((event.message.text.split(':')?.[1] ?? '').trim() === '0') {
       publish(mqtt_publisher, mqtt_topic, { command: 'alert', enable: false });
       return client.replyMessage(event.replyToken, {
         type: 'text',
         text: 'Disable alert feature.',
+      });
+    }
+  }
+
+  // start streaming or stop streaming
+  if (event.type === 'message' && event.message.text.slice(0, 8) === '!stream:') {
+    if ((event.message.text.split(':')?.[1] ?? '').trim() === '1') {
+      const userObj = await Users.findOne({ userId: event.source.userId });
+      if (userObj?.streamingKey) {
+        publish(mqtt_publisher, mqtt_topic, { command: 'stream_on', stream_key: userObj.streamingKey });
+        return client.replyMessage(event.replyToken, {
+          type: 'text',
+          text: 'Start streaming.',
+        });
+      } else {
+        return client.replyMessage(event.replyToken, {
+          type: 'text',
+          text: 'Type !streaming_key: YOUR_STREAMING_KEY to enable streaming.',
+        });
+      }
+    } else if ((event.message.text.split(':')?.[1] ?? '').trim() === '0') {
+      publish(mqtt_publisher, mqtt_topic, { command: 'stream_off' });
+      return client.replyMessage(event.replyToken, {
+        type: 'text',
+        text: 'Stop streaming.',
       });
     }
   }
