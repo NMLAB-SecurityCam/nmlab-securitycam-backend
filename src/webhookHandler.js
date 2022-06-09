@@ -24,6 +24,7 @@ const webhookHandler = async (event, client) => {
         const newUserObj = new Users({
           _id: lineId,
           userId: event.source.userId,
+          streamingKey: null,
         });
         try {
           await Users.deleteMany({ userId: event.source.userId });
