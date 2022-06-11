@@ -55,4 +55,18 @@ router.post('/alert', async (req, res) => {
   }
 });
 
+router.post('/snapshot', async (req, res) => {
+  const userObj = await Users.findById(req.body.id);
+  if (userObj?.userId) {
+    await client.pushMessage(userObj.userId, {
+      type: 'image',
+      originalContentUrl: req.body.img_url,
+      previewImageUrl: req.body.img_url,
+    });
+    res.status(200).send({ message: 'Snapshot forwarded successfully!' });
+  } else {
+    res.status(400).send({ message: 'UserID not found. Either the user does not exist or user does not register and activate this feature.' });
+  }
+});
+
 export default router;
