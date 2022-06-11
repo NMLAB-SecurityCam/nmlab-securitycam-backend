@@ -14,7 +14,6 @@
     "dependencies": {
         "@line/bot-sdk": "^7.5.0",
         "aws-sdk": "^2.1151.0",
-        "axios": "^0.27.2",
         "core-js": "^3.22.8",
         "cors": "^2.8.5",
         "dotenv-defaults": "^5.0.0",
