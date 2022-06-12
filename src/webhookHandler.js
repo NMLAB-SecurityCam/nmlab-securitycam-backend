@@ -176,12 +176,14 @@ const webhookHandler = async (event, client) => {
     await client.getMessageContent(event.message.id).then((
       stream => {
         stream.on('data', chunk =>{
-          // console.log(chunk);
           buffers.push(chunk);
         })
         stream.on('end', () => {
           var buf = Buffer.concat(buffers);
-          saveImages(buf);
+          saveImages(buf).then( image_uri => {
+            console.log(image_uri);
+            publish(mqtt_publisher, mqtt_topic, { command: 'whitelist', photo_uri: image_uri });  
+          })
         })
       }
     ));
