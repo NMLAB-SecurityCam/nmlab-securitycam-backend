@@ -8,7 +8,7 @@ const mock_up_img_url = 'https://nmlab-final-securitycam.s3.ap-northeast-1.amazo
 const webhookHandler = async (event, client) => {
   // if you still want to keep this, take off the event.message.type !== 'text' condition.
   // if (event.type !== 'message' || event.message.type !== 'text') {
-    // return Promise.resolve(null);
+  // return Promise.resolve(null);
   // }
 
   // setup lineID
@@ -163,7 +163,7 @@ const webhookHandler = async (event, client) => {
     });
   }
 
-  if(event.message.type === 'image') {
+  if (event.message.type === 'image') {
     const whitelistObj = await WhitelistBuffers.findById(event.source.userId);
     if (!whitelistObj) {
       return client.replyMessage(event.replyToken, {
@@ -171,22 +171,20 @@ const webhookHandler = async (event, client) => {
         text: 'If you want to upload images to whitelist, please type !whitelist first',
       });
     }
-    await WhitelistBuffers.deleteMany({_id: event.source.userId});
-    var buffers = [];
-    await client.getMessageContent(event.message.id).then((
-      stream => {
-        stream.on('data', chunk =>{
-          buffers.push(chunk);
-        })
-        stream.on('end', () => {
-          var buf = Buffer.concat(buffers);
-          saveImages(buf).then( image_uri => {
-            console.log(image_uri);
-            publish(mqtt_publisher, mqtt_topic, { command: 'whitelist', photo_uri: image_uri });  
-          })
-        })
-      }
-    ));
+    await WhitelistBuffers.deleteMany({ _id: event.source.userId });
+    const buffers = [];
+    await client.getMessageContent(event.message.id).then(stream => {
+      stream.on('data', chunk => {
+        buffers.push(chunk);
+      });
+      stream.on('end', () => {
+        const buf = Buffer.concat(buffers);
+        saveImages(buf).then(image_uri => {
+          // console.log(image_uri);
+          publish(mqtt_publisher, mqtt_topic, { command: 'whitelist', photo_uri: image_uri });
+        });
+      });
+    });
     return client.replyMessage(event.replyToken, {
       type: 'text',
       text: 'Whitelist set.',
