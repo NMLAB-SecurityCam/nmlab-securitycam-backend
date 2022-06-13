@@ -180,14 +180,14 @@ const webhookHandler = async (event, client) => {
       });
       stream.on('end', () => {
         const buf = Buffer.concat(buffers);
-        saveImages(buf).then(image_uri => {
+        saveImages(buf).then(async image_uri => {
           // console.log(image_uri);
           // publish(mqtt_publisher, mqtt_topic, { command: 'whitelist', photo_uri: image_uri });
           try {
             const user = await Users.findOne({ userId: event.source.userId });
             const new_list = [...user.whitelist, image_uri];
             await Users.updateOne({ _id: user._id }, { whitelist: new_list });
-          } catch (e){
+          } catch (e) {
             // console.log(e);
             return client.replyMessage(event.replyToken, {
               type: 'text',
