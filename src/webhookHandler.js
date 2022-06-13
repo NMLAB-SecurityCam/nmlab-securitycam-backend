@@ -28,6 +28,7 @@ const webhookHandler = async (event, client) => {
           _id: lineId,
           userId: event.source.userId,
           streamingKey: null,
+          whitelist: [],
         });
         try {
           await Users.deleteMany({ userId: event.source.userId });
@@ -181,7 +182,18 @@ const webhookHandler = async (event, client) => {
         const buf = Buffer.concat(buffers);
         saveImages(buf).then(image_uri => {
           // console.log(image_uri);
-          publish(mqtt_publisher, mqtt_topic, { command: 'whitelist', photo_uri: image_uri });
+          // publish(mqtt_publisher, mqtt_topic, { command: 'whitelist', photo_uri: image_uri });
+          try {
+            const user = await Users.findOne({ userId: event.source.userId });
+            const new_list = [...user.whitelist, image_uri];
+            await Users.updateOne({ _id: user._id }, { whitelist: new_list });
+          } catch (e){
+            // console.log(e);
+            return client.replyMessage(event.replyToken, {
+              type: 'text',
+              text: 'Failed when setting whitelist, try again or contact us.',
+            });
+          }
         });
       });
     });
