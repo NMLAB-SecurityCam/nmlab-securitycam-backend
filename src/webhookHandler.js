@@ -229,19 +229,19 @@ const webhookHandler = async (event, client) => {
   }
   
 
-    // help message
-    if (event.message.type === 'text' && event.message.text.trim() === '!help') {
-      return client.replyMessage(event.replyToken, {
-        type: 'text',
-        text: '1. !id:{username} => Register\n'+
-        '2. !streaming_key:{streamingkey} => Set up youtube streaming\n'+
-        '3. !snapshot\n => Show current photo\n'+
-        '4. !alert:1/0 => Enable/Disable alert\n'+
-        '5. !stream:1/0 => Enable/Disable streaming\n'+
-        '6. !whitelist + send an image => Set whitelist\n'+
-        '7. !whitelist:1/0 => Enable/Disable Whitelist',
-      });
-    }
+  // help message
+  if (event.message.type === 'text' && event.message.text.trim() === '!help') {
+    return client.replyMessage(event.replyToken, {
+      type: 'text',
+      text: '1. !id:{username} => Register\n'+
+      '2. !streaming_key:{streamingkey} => Set up youtube streaming\n'+
+      '3. !snapshot\n => Show current photo\n'+
+      '4. !alert:1/0 => Enable/Disable alert\n'+
+      '5. !stream:1/0 => Enable/Disable streaming\n'+
+      '6. !whitelist + send an image => Set whitelist\n'+
+      '7. !whitelist:1/0 => Enable/Disable Whitelist',
+    });
+  }
 
   /*
     implement response logic here,
