@@ -4,6 +4,14 @@ const users = new mongoose.Schema({
   userId: String, // Line UserId used for API
   streamingKey: String,
   whitelist: [String],
+  auth0Id: String,
+  images: [
+    {
+      url: String,
+      timestamp: String,
+      image_type: String,
+    },
+  ],
   // snapshot: [...Image],
   // alert: [...Image],
   // device: [`255.255.255.255:3000`, `123.123.123.123:3000`],
