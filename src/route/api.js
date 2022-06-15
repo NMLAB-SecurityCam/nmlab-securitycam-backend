@@ -105,7 +105,7 @@ router.post('/create_user', async (req, res) => {
     if (!userObj) {
       // create a user
       const newUserObj = new Users({
-        _id: lineId,
+        _id: req.body.id,
         userId: null,
         streamingKey: null,
         whitelist: [],
