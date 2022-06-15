@@ -112,6 +112,7 @@ router.post('/create_user', async (req, res) => {
         streamingKey: null,
         whitelist: [],
         auth0Id: req.body.auth0Id,
+        images: [],
       });
       try {
         await newUserObj.save();
