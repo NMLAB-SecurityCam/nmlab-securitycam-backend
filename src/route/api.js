@@ -90,10 +90,8 @@ router.post('/user', async (req, res) => {
   try {
     const targetUser = await Users.findOne({ auth0Id: req.body.user });
     if (!targetUser) {
-      console.log('sent!');
       res.status(200).send({ user: null });
     } else {
-      console.log('sent!');
       res.status(200).send({ user: targetUser });
     }
   } catch (e) {
