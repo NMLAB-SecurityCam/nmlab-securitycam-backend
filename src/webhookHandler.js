@@ -22,7 +22,7 @@ const webhookHandler = async (event, client) => {
         await Users.findByIdAndUpdate(lineId, { userId: event.source.userId });
         return client.replyMessage(event.replyToken, {
           type: 'text',
-          text: `Your LineId has registered already.`,
+          text: `Registered success :).`,
         });
       } else {
         const newUserObj = new Users({
