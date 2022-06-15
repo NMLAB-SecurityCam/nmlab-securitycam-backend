@@ -3,6 +3,7 @@ const users = new mongoose.Schema({
   _id: String, // Unique LineID
   userId: String, // Line UserId used for API
   streamingKey: String,
+  whitelist: [String],
   // snapshot: [...Image],
   // alert: [...Image],
   // device: [`255.255.255.255:3000`, `123.123.123.123:3000`],

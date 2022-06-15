@@ -1,15 +1,18 @@
 import Users from './Users';
+import WhitelistBuffers from './Whitelist';
 import { mqtt_publisher, publish, mqtt_topic } from './mqtt_client';
+import saveImages from './saveImages';
 
 const mock_up_img_url = 'https://nmlab-final-securitycam.s3.ap-northeast-1.amazonaws.com/img-1653129955256.png';
 
 const webhookHandler = async (event, client) => {
-  if (event.type !== 'message' || event.message.type !== 'text') {
-    return Promise.resolve(null);
-  }
+  // if you still want to keep this, take off the event.message.type !== 'text' condition.
+  // if (event.type !== 'message' || event.message.type !== 'text') {
+  // return Promise.resolve(null);
+  // }
 
   // setup lineID
-  if (event.type === 'message' && event.message.text.slice(0, 4) === '!id:') {
+  if (event.message.type === 'text' && event.message.text.slice(0, 4) === '!id:') {
     // register a [lineID, userId] user obj to DB's collection
     let lineId = event.message.text.split(':')?.[1] ?? '';
     if (lineId !== '' || lineId.trim() !== '') {
@@ -25,6 +28,7 @@ const webhookHandler = async (event, client) => {
           _id: lineId,
           userId: event.source.userId,
           streamingKey: null,
+          whitelist: [],
         });
         try {
           await Users.deleteMany({ userId: event.source.userId });
@@ -54,7 +58,7 @@ const webhookHandler = async (event, client) => {
   }
 
   // setup yt streaming key
-  if (event.type === 'message' && event.message.text.split(':')?.[0] === '!streaming_key') {
+  if (event.message.type === 'text' && event.message.text.split(':')?.[0] === '!streaming_key') {
     const userObj = await Users.findOne({ userId: event.source.userId });
     const streamingKey = event.message.text.split(':')?.[1] ?? '';
     if (userObj) {
@@ -86,7 +90,7 @@ const webhookHandler = async (event, client) => {
   }
 
   // snapshot
-  if (event.type === 'message' && event.message.text.trim() === '!snapshot') {
+  if (event.message.type === 'text' && event.message.text.trim() === '!snapshot') {
     const userObj = await Users.findOne({ userId: event.source.userId });
     if (userObj?.userId) {
       // can do requets to ask the machine to take pics and save it in s3 and transfer it back here
@@ -104,7 +108,7 @@ const webhookHandler = async (event, client) => {
   }
 
   // enable or disable alert
-  if (event.type === 'message' && event.message.text.slice(0, 7) === '!alert:') {
+  if (event.message.type === 'text' && event.message.text.slice(0, 7) === '!alert:') {
     if ((event.message.text.split(':')?.[1] ?? '').trim() === '1') {
       publish(mqtt_publisher, mqtt_topic, { command: 'alert', enable: true });
       return client.replyMessage(event.replyToken, {
@@ -121,7 +125,7 @@ const webhookHandler = async (event, client) => {
   }
 
   // start streaming or stop streaming
-  if (event.type === 'message' && event.message.text.slice(0, 8) === '!stream:') {
+  if (event.message.type === 'text' && event.message.text.slice(0, 8) === '!stream:') {
     if ((event.message.text.split(':')?.[1] ?? '').trim() === '1') {
       const userObj = await Users.findOne({ userId: event.source.userId });
       if (userObj?.streamingKey) {
@@ -143,6 +147,60 @@ const webhookHandler = async (event, client) => {
         text: 'Stop streaming.',
       });
     }
+  }
+
+  // implement whitelist
+  if (event.message.type === 'text' && event.message.text.trim() === '!whitelist') {
+    const whitelistObj = await WhitelistBuffers.findById(event.source.userId);
+    if (!whitelistObj) {
+      const newWhitelistObj = new WhitelistBuffers({
+        _id: event.source.userId,
+      });
+      await newWhitelistObj.save();
+    }
+    return client.replyMessage(event.replyToken, {
+      type: 'text',
+      text: 'Please upload photo for whitelist.',
+    });
+  }
+
+  if (event.message.type === 'image') {
+    const whitelistObj = await WhitelistBuffers.findById(event.source.userId);
+    if (!whitelistObj) {
+      return client.replyMessage(event.replyToken, {
+        type: 'text',
+        text: 'If you want to upload images to whitelist, please type !whitelist first',
+      });
+    }
+    await WhitelistBuffers.deleteMany({ _id: event.source.userId });
+    const buffers = [];
+    await client.getMessageContent(event.message.id).then(stream => {
+      stream.on('data', chunk => {
+        buffers.push(chunk);
+      });
+      stream.on('end', () => {
+        const buf = Buffer.concat(buffers);
+        saveImages(buf).then(async image_uri => {
+          // console.log(image_uri);
+          // publish(mqtt_publisher, mqtt_topic, { command: 'whitelist', photo_uri: image_uri });
+          try {
+            const user = await Users.findOne({ userId: event.source.userId });
+            const new_list = [...user.whitelist, image_uri];
+            await Users.updateOne({ _id: user._id }, { whitelist: new_list });
+          } catch (e) {
+            // console.log(e);
+            return client.replyMessage(event.replyToken, {
+              type: 'text',
+              text: 'Failed when setting whitelist, try again or contact us.',
+            });
+          }
+        });
+      });
+    });
+    return client.replyMessage(event.replyToken, {
+      type: 'text',
+      text: 'Whitelist set.',
+    });
   }
 
   /*

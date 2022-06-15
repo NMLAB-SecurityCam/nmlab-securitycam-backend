@@ -63,4 +63,13 @@ router.post('/snapshot', async (req, res) => {
   }
 });
 
+router.post('/whitelist', async (req, res) => {
+  const userObj = await Users.findById(req.body.id);
+  if (userObj?.userId) {
+    res.status(200).send({ whitelist: userObj.whitelist });
+  } else {
+    res.status(404).send({ whitelist: null });
+  }
+});
+
 export default router;
