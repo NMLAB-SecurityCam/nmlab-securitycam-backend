@@ -94,7 +94,7 @@ const webhookHandler = async (event, client) => {
     const userObj = await Users.findOne({ userId: event.source.userId });
     if (userObj?.userId) {
       // can do requets to ask the machine to take pics and save it in s3 and transfer it back here
-      publish(mqtt_publisher, mqtt_topic, { command: 'snapshot', line_id: event.source.userId });
+      publish(mqtt_publisher, mqtt_topic, { command: 'snapshot', line_id: userObj?._id ?? '' });
       return client.replyMessage(event.replyToken, {
         type: 'text',
         text: 'Here is your snapshot.',
@@ -110,13 +110,15 @@ const webhookHandler = async (event, client) => {
   // enable or disable alert
   if (event.message.type === 'text' && event.message.text.slice(0, 7) === '!alert:') {
     if ((event.message.text.split(':')?.[1] ?? '').trim() === '1') {
-      publish(mqtt_publisher, mqtt_topic, { command: 'alert', enable: true , line_id: event.source.userId});
+      const userObj = await Users.findOne({ userId: event.source.userId });
+      publish(mqtt_publisher, mqtt_topic, { command: 'alert', enable: true, line_id: userObj?._id ?? '' });
       return client.replyMessage(event.replyToken, {
         type: 'text',
         text: 'Enable alert feature.',
       });
     } else if ((event.message.text.split(':')?.[1] ?? '').trim() === '0') {
-      publish(mqtt_publisher, mqtt_topic, { command: 'alert', enable: false , line_id: event.source.userId});
+      const userObj = await Users.findOne({ userId: event.source.userId });
+      publish(mqtt_publisher, mqtt_topic, { command: 'alert', enable: false, line_id: userObj?._id ?? '' });
       return client.replyMessage(event.replyToken, {
         type: 'text',
         text: 'Disable alert feature.',
@@ -129,7 +131,7 @@ const webhookHandler = async (event, client) => {
     if ((event.message.text.split(':')?.[1] ?? '').trim() === '1') {
       const userObj = await Users.findOne({ userId: event.source.userId });
       if (userObj?.streamingKey) {
-        publish(mqtt_publisher, mqtt_topic, { command: 'stream_on', stream_key: userObj.streamingKey , line_id: event.source.userId});
+        publish(mqtt_publisher, mqtt_topic, { command: 'stream_on', stream_key: userObj.streamingKey, line_id: userObj?._id ?? '' });
         return client.replyMessage(event.replyToken, {
           type: 'text',
           text: 'Start streaming.',
@@ -141,7 +143,8 @@ const webhookHandler = async (event, client) => {
         });
       }
     } else if ((event.message.text.split(':')?.[1] ?? '').trim() === '0') {
-      publish(mqtt_publisher, mqtt_topic, { command: 'stream_off' , line_id: event.source.userId});
+      const userObj = await Users.findOne({ userId: event.source.userId });
+      publish(mqtt_publisher, mqtt_topic, { command: 'stream_off', line_id: userObj?._id ?? '' });
       return client.replyMessage(event.replyToken, {
         type: 'text',
         text: 'Stop streaming.',
@@ -208,7 +211,7 @@ const webhookHandler = async (event, client) => {
     if ((event.message.text.split(':')?.[1] ?? '').trim() === '1') {
       const userObj = await Users.findOne({ userId: event.source.userId });
       if (userObj) {
-        publish(mqtt_publisher, mqtt_topic, { command: 'whitelist_on', line_id: event.source.userId});
+        publish(mqtt_publisher, mqtt_topic, { command: 'whitelist_on', line_id: userObj?._id ?? '' });
         return client.replyMessage(event.replyToken, {
           type: 'text',
           text: 'Whitelist ON.',
@@ -220,14 +223,14 @@ const webhookHandler = async (event, client) => {
         });
       }
     } else if ((event.message.text.split(':')?.[1] ?? '').trim() === '0') {
-      publish(mqtt_publisher, mqtt_topic, { command: 'whitelist_off' , line_id: event.source.userId});
+      const userObj = await Users.findOne({ userId: event.source.userId });
+      publish(mqtt_publisher, mqtt_topic, { command: 'whitelist_off', line_id: userObj?._id ?? '' });
       return client.replyMessage(event.replyToken, {
         type: 'text',
         text: 'Whitelist OFF.',
       });
     }
   }
-  
 
   // help message
   if (event.message.type === 'text' && event.message.text.trim() === '!help') {
