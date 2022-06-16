@@ -33,3 +33,13 @@ Clone this repository, then create an .env file and fill it according to .env.de
 ```
 yarn && yarn dev
 ```
+Here is ENV file configuration and default value
+| KEY                            | Description                                       | Default Value              |
+| ------------------------------ | ------------------------------------------------- | -------------------------- |
+| PORT         | PORT of server                          | 5000 |
+| MODE         | dev / prod (NOT USED ANYMORE, ignore plz)                     | prod                         |
+| LINE_ACCESS_TOKEN         | Token of Line bot service                     | N/A                        |
+| LINE_CHANNEL_SECRET      | Secret of Line bot service           | N/A                        |
+| MONGO_URL    | MongoDB url to connect to database                      | N/A                        |
+| MQTT_CHANNEL | Mqtt channel on broker used by our service                      | N/A                        |
+| s3_region, s3_bucket_name, s3_access_key, s3_secret_access_key      | AWS s3 bucket config & secrets | N/A                        |
