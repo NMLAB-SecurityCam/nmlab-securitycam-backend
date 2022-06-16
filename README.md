@@ -1,4 +1,4 @@
-# Deploy To Github
+# Deploy To Heroku
 
 Install heroku command line tool first.
 
@@ -29,6 +29,7 @@ to check the deploy result & log on heroku server
 
 # Run locally
 
+Clone this repository, then create an .env file and fill it according to .env.defaults
 ```
 yarn && yarn dev
 ```
