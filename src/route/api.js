@@ -43,6 +43,13 @@ router.post('/alert', async (req, res) => {
       originalContentUrl: req.body.img_url,
       previewImageUrl: req.body.img_url,
     });
+    const new_images = userObj?.images ?? [];
+    new_images.push({
+      url: req.body.img_url,
+      timestamp: new Date().toISOString(),
+      image_type: 'alert',
+    });
+    await Users.findByIdAndUpdate(req.body.id, { images: new_images });
     res.status(200).send({ message: 'Message forwarded successfully!' });
   } else {
     res.status(400).send({ message: 'UserID not found. Either the user does not exist or user does not register and activate this feature.' });
@@ -57,6 +64,13 @@ router.post('/snapshot', async (req, res) => {
       originalContentUrl: req.body.img_url,
       previewImageUrl: req.body.img_url,
     });
+    const new_images = userObj?.images ?? [];
+    new_images.push({
+      url: req.body.img_url,
+      timestamp: new Date().toISOString(),
+      image_type: 'snapshot',
+    });
+    await Users.findByIdAndUpdate(req.body.id, { images: new_images });
     res.status(200).send({ message: 'Snapshot forwarded successfully!' });
   } else {
     res.status(400).send({ message: 'UserID not found. Either the user does not exist or user does not register and activate this feature.' });
@@ -69,6 +83,55 @@ router.post('/whitelist', async (req, res) => {
     res.status(200).send({ whitelist: userObj.whitelist });
   } else {
     res.status(404).send({ whitelist: null });
+  }
+});
+
+router.post('/user', async (req, res) => {
+  try {
+    const targetUser = await Users.findOne({ auth0Id: req.body.user });
+    if (!targetUser) {
+      res.status(200).send({ user: null });
+    } else {
+      res.status(200).send({ user: targetUser });
+    }
+  } catch (e) {
+    res.status(400).send({ message: 'Error occur' });
+  }
+});
+
+router.post('/create_user', async (req, res) => {
+  try {
+    const userObj = await Users.findById(req.body.id);
+    if (!userObj) {
+      // create a user
+      const newUserObj = new Users({
+        _id: req.body.id,
+        userId: null,
+        streamingKey: null,
+        whitelist: [],
+        auth0Id: req.body.auth0Id,
+        images: [],
+      });
+      try {
+        await newUserObj.save();
+        res.status(200).send({ success: true });
+      } catch (e) {
+        res.status(400).send({ success: false });
+      }
+    } else {
+      //already exists
+      // update user, add auth0Id field
+      try {
+        await Users.findByIdAndUpdate(req.body.id, {
+          auth0Id: req.body.auth0Id,
+        });
+        res.status(200).send({ success: true });
+      } catch (e) {
+        res.status(400).send({ success: false });
+      }
+    }
+  } catch (e) {
+    res.status(400).send({ message: 'Error occur' });
   }
 });
 

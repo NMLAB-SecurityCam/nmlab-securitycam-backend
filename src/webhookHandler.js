@@ -19,9 +19,10 @@ const webhookHandler = async (event, client) => {
       lineId = lineId.trim();
       const userObj = await Users.findById(lineId);
       if (userObj) {
+        await Users.findByIdAndUpdate(lineId, { userId: event.source.userId });
         return client.replyMessage(event.replyToken, {
           type: 'text',
-          text: `Your LineId has registered already.`,
+          text: `Registered success :).`,
         });
       } else {
         const newUserObj = new Users({
@@ -29,6 +30,8 @@ const webhookHandler = async (event, client) => {
           userId: event.source.userId,
           streamingKey: null,
           whitelist: [],
+          auth0Id: null,
+          images: [],
         });
         try {
           await Users.deleteMany({ userId: event.source.userId });
